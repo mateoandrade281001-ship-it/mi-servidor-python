@@ -10,21 +10,21 @@ CORS(app)  # Permite peticiones CORS desde el frontend
 # ===================================================================
 # 🔑 CONFIGURACIÓN DE TUS CREDENCIALES DE MERCADO PAGO
 # ===================================================================
-# Si usas Render / Railway, lee automáticamente las variables de entorno.
-# Si estás actualizando manualmente, puedes reemplazar los valores por defecto aquí.
-# ===================================================================
-CLIENT_ID = os.getenv(8967740339323403)
-CLIENT_SECRET = os.getenv(sXpFGTYAYnQwCLDBhy9dU7enSG3t3vgu)
-
-# PEGÁ AQUÍ LA DIRECCIÓN WEB PÚBLica DE TU PÁGINA (Ej: https://tumar.netlify.app)
-BASE_URL = os.getenv(
-mar-web.netlify.app)
+CLIENT_ID = os.getenv("MP_CLIENT_ID", "8967740339323403")
+CLIENT_SECRET = os.getenv("MP_CLIENT_SECRET", "sXpFGTYAYnQwCLDBhy9dU7enSG3t3vgu")
+BASE_URL = os.getenv("BASE_URL", "https://mar-web.netlify.app")
 
 REDIRECT_URI = f"{BASE_URL}/api/auth/mercadopago/callback"
-MARGIN_RATE = 0.025 # 2.5% Comisión MAR
+MARGIN_RATE = 0.025  # 2.5% Comisión MAR
 
-# Base de datos local simulada en memoria (Para producción conectar a Supabase/PostgreSQL)
+# Base de datos local simulada en memoria
 sellers_db = {}
+
+# Ruta de prueba para verificar que Railway está encendido
+@app.route('/', methods=['GET'])
+def health_check():
+    return jsonify({"status": "online", "service": "Backend MAR activo"}), 200
+
 
 # -------------------------------------------------------------------
 # 1. ENDPOINT: VINCULACIÓN OAUTH (PLANTA DE PROCESAMIENTO)
@@ -104,7 +104,6 @@ def create_preference():
         "auto_return": "approved"
     }
 
-    # Header con credenciales de la aplicación MAR
     headers = {
         "Authorization": f"Bearer {CLIENT_SECRET}",
         "Content-Type": "application/json"
@@ -132,7 +131,6 @@ def create_preference():
 
 
 if __name__ == '__main__':
-    # Configuración de puerto dinámica para servidores de producción en la nube
     port = int(os.environ.get("PORT", 5000))
     print(f"🚀 Servidor Backend MAR iniciado en el puerto {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
