@@ -1302,7 +1302,7 @@
             alias: "MAR.PESQUERA.MP",
             cvu: "0000003100084920194821",
             holder: "MAR Intermediación Digital",
-            backendUrl: ""
+            backendUrl: "https://mi-servidor-python-production.up.railway.app/api/create-preference"
         };
 
         let isDraggingFab = false;
@@ -2876,9 +2876,10 @@
             let totalFee = cart.reduce((acc, i) => acc + Math.round(i.requestedKg * i.netPrice * MARGIN_RATE), 0);
             let totalNetAmount = cart.reduce((acc, i) => acc + Math.round(i.requestedKg * i.netPrice), 0);
 
-            // Si eligió Mercado Pago Checkout y tiene backend configurado, redirigir a MP real
+            // Si eligió Mercado Pago Checkout, redirigir a la pasarela oficial en Railway
             if (selectedPaymentMethod === 'MERCADOPAGO' && paymentConfig.backendUrl) {
                 try {
+                    showToast("Conectando con Mercado Pago...", "success");
                     const res = await fetch(paymentConfig.backendUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -2888,11 +2889,16 @@
                         })
                     });
                     const mpData = await res.json();
-                    if (mpData && mpData.init_point) {
-                        window.open(mpData.init_point, '_blank');
+                    if (res.ok && mpData && mpData.init_point) {
+                        window.location.href = mpData.init_point;
+                        return;
+                    } else {
+                        showToast(`Error MP: ${mpData.error || 'No se pudo generar el link de pago'}`, "error");
+                        return;
                     }
                 } catch (e) {
-                    console.log("Procesando preferencia local.");
+                    showToast("Error de conexión con el servidor de pagos.", "error");
+                    return;
                 }
             }
 
