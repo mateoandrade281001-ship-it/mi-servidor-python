@@ -13,8 +13,9 @@ CORS(app)  # Permite peticiones CORS desde el frontend
 CLIENT_ID = os.getenv("MP_CLIENT_ID", "8967740339323403")
 CLIENT_SECRET = os.getenv("MP_CLIENT_SECRET", "sXpFGTYAYnQwCLDBhy9dU7enSG3t3vgu")
 BASE_URL = os.getenv("BASE_URL", "https://mar-web.netlify.app")
+SERVER_URL = os.getenv("SERVER_URL", "https://mi-servidor-python-production.up.railway.app")
 
-REDIRECT_URI = f"{BASE_URL}/api/auth/mercadopago/callback"
+REDIRECT_URI = f"{SERVER_URL}/api/auth/mercadopago/callback"
 MARGIN_RATE = 0.025  # 2.5% Comisión MAR
 
 # Base de datos local simulada en memoria
